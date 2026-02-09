@@ -115,6 +115,45 @@ app.get("/api/health", (_req, res) => {
   res.json({ ok: true });
 });
 
+app.get("/api/products/search", async (req, res) => {
+  try {
+    const nameQuery = String(req.query.name || "").trim();
+    if (!nameQuery) {
+      return res.status(400).json({ error: "Name query is required." });
+    }
+
+    const product = await Product.findOne({
+      nombre: { $regex: new RegExp(nameQuery, "i") },
+    });
+
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    const iva = Number((product.precio * ivaRate).toFixed(2));
+    const totalWithIva = Number((product.precio + iva).toFixed(2));
+    return res.json({
+      product: {
+        id: product.id,
+        nombre: product.nombre,
+        precio: Number(product.precio.toFixed(2)),
+        categoria: product.categoria,
+        stock: product.stock,
+        imagen: product.imagen,
+        descripcion: product.descripcion,
+        fechaCreacion: product.fechaCreacion,
+        descuento: product.descuento,
+      },
+      iva,
+      totalWithIva,
+      rate: ivaRate,
+    });
+  } catch (error) {
+    console.error("Product name search error:", error);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
 app.get("/api/products/:id", async (req, res) => {
   try {
     const product = await Product.findOne({ id: String(req.params.id).trim() });
@@ -173,45 +212,6 @@ app.get("/api/iva/:id", async (req, res) => {
     });
   } catch (error) {
     console.error("IVA lookup error:", error);
-    return res.status(500).json({ error: "Server error" });
-  }
-});
-
-app.get("/api/products/search", async (req, res) => {
-  try {
-    const nameQuery = String(req.query.name || "").trim();
-    if (!nameQuery) {
-      return res.status(400).json({ error: "Name query is required." });
-    }
-
-    const product = await Product.findOne({
-      nombre: { $regex: new RegExp(nameQuery, "i") },
-    });
-
-    if (!product) {
-      return res.status(404).json({ error: "Product not found" });
-    }
-
-    const iva = Number((product.precio * ivaRate).toFixed(2));
-    const totalWithIva = Number((product.precio + iva).toFixed(2));
-    return res.json({
-      product: {
-        id: product.id,
-        nombre: product.nombre,
-        precio: Number(product.precio.toFixed(2)),
-        categoria: product.categoria,
-        stock: product.stock,
-        imagen: product.imagen,
-        descripcion: product.descripcion,
-        fechaCreacion: product.fechaCreacion,
-        descuento: product.descuento,
-      },
-      iva,
-      totalWithIva,
-      rate: ivaRate,
-    });
-  } catch (error) {
-    console.error("Product name search error:", error);
     return res.status(500).json({ error: "Server error" });
   }
 });
