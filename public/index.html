@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>IVA Calculator</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <section class="card">
+        <header>
+          <p class="eyebrow">Partial 3</p>
+          <h1>IVA Calculator</h1>
+          <p class="sub">Enter five products and compute IVA only.</p>
+        </header>
+
+        <form id="product-form">
+          <div class="grid">
+            <div class="field">
+              <label for="name-1">Product 1</label>
+              <input id="name-1" name="name-1" placeholder="Name" required />
+              <input
+                id="price-1"
+                name="price-1"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="Price"
+                required
+              />
+            </div>
+            <div class="field">
+              <label for="name-2">Product 2</label>
+              <input id="name-2" name="name-2" placeholder="Name" required />
+              <input
+                id="price-2"
+                name="price-2"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="Price"
+                required
+              />
+            </div>
+            <div class="field">
+              <label for="name-3">Product 3</label>
+              <input id="name-3" name="name-3" placeholder="Name" required />
+              <input
+                id="price-3"
+                name="price-3"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="Price"
+                required
+              />
+            </div>
+            <div class="field">
+              <label for="name-4">Product 4</label>
+              <input id="name-4" name="name-4" placeholder="Name" required />
+              <input
+                id="price-4"
+                name="price-4"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="Price"
+                required
+              />
+            </div>
+            <div class="field">
+              <label for="name-5">Product 5</label>
+              <input id="name-5" name="name-5" placeholder="Name" required />
+              <input
+                id="price-5"
+                name="price-5"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="Price"
+                required
+              />
+            </div>
+          </div>
+
+          <button type="submit">Compute IVA</button>
+        </form>
+
+        <section class="result" id="result" aria-live="polite">
+          <div>
+            <span>Total</span>
+            <strong id="total-value">-</strong>
+          </div>
+          <div>
+            <span>IVA (15%)</span>
+            <strong id="iva-value">-</strong>
+          </div>
+        </section>
+
+        <p class="status" id="status"></p>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

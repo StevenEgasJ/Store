@@ -1,0 +1,16 @@
+{
+  "name": "partial3-iva",
+  "version": "1.0.0",
+  "description": "Compute IVA for five products with MongoDB storage",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "seed": "node seed.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mongoose": "^8.9.1"
+  }
+}
