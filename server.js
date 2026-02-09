@@ -6,6 +6,8 @@ require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 3000;
 const ivaRate = Number.parseFloat(process.env.IVA_RATE || "0.15");
+const businessHealthUrl =
+  process.env.BUSINESS_HEALTH_URL || "https://examen-1-tcba.onrender.com";
 
 if (Number.isNaN(ivaRate) || ivaRate < 0) {
   throw new Error("IVA_RATE must be a non-negative number.");
@@ -69,6 +71,45 @@ const Product = mongoose.model("Product", productSchema);
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
+
+const checkBusinessServer = async () => {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 3000);
+
+  try {
+    const response = await fetch(businessHealthUrl, {
+      method: "GET",
+      signal: controller.signal,
+    });
+    return response.ok;
+  } catch (error) {
+    return false;
+  } finally {
+    clearTimeout(timeout);
+  }
+};
+
+app.use(async (req, res, next) => {
+  if (req.path === "/api/health") {
+    return next();
+  }
+
+  const ok = await checkBusinessServer();
+  if (!ok) {
+    if (req.path.startsWith("/api")) {
+      return res.status(503).json({
+        ok: false,
+        message: "not business server, iva doesnt work",
+      });
+    }
+
+    return res
+      .status(503)
+      .send("not business server, iva doesnt work");
+  }
+
+  return next();
+});
 
 app.get("/api/health", (_req, res) => {
   res.json({ ok: true });
