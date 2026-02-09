@@ -24,19 +24,44 @@ mongoose
   });
 
 const productSchema = new mongoose.Schema({
-  name: {
+  id: {
     type: String,
     required: true,
     trim: true,
   },
-  price: {
+  nombre: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  precio: {
     type: Number,
     required: true,
     min: 0,
   },
-  createdAt: {
+  categoria: {
+    type: String,
+    trim: true,
+  },
+  stock: {
+    type: Number,
+    min: 0,
+  },
+  imagen: {
+    type: String,
+    trim: true,
+  },
+  descripcion: {
+    type: String,
+    trim: true,
+  },
+  fechaCreacion: {
     type: Date,
-    default: Date.now,
+  },
+  descuento: {
+    type: Number,
+    min: 0,
+    default: 0,
   },
 });
 
@@ -49,14 +74,33 @@ app.get("/api/health", (_req, res) => {
   res.json({ ok: true });
 });
 
-app.get("/api/products", async (_req, res) => {
+app.get("/api/products/:id", async (req, res) => {
   try {
-    const products = await Product.find({}, { name: 1, price: 1 }).sort({
-      createdAt: -1,
+    const product = await Product.findOne({ id: String(req.params.id).trim() });
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    const iva = Number((product.precio * ivaRate).toFixed(2));
+    const totalWithIva = Number((product.precio + iva).toFixed(2));
+    return res.json({
+      product: {
+        id: product.id,
+        nombre: product.nombre,
+        precio: Number(product.precio.toFixed(2)),
+        categoria: product.categoria,
+        stock: product.stock,
+        imagen: product.imagen,
+        descripcion: product.descripcion,
+        fechaCreacion: product.fechaCreacion,
+        descuento: product.descuento,
+      },
+      iva,
+      totalWithIva,
+      rate: ivaRate,
     });
-    return res.json({ products, rate: ivaRate });
   } catch (error) {
-    console.error("Products fetch error:", error);
+    console.error("Product lookup error:", error);
     return res.status(500).json({ error: "Server error" });
   }
 });
@@ -69,46 +113,33 @@ app.get("/api/products/search", async (req, res) => {
     }
 
     const product = await Product.findOne({
-      name: { $regex: new RegExp(`^${nameQuery}$`, "i") },
+      nombre: { $regex: new RegExp(nameQuery, "i") },
     });
 
     if (!product) {
       return res.status(404).json({ error: "Product not found" });
     }
 
+    const iva = Number((product.precio * ivaRate).toFixed(2));
+    const totalWithIva = Number((product.precio + iva).toFixed(2));
     return res.json({
       product: {
-        _id: product._id,
-        name: product.name,
-        price: Number(product.price.toFixed(2)),
+        id: product.id,
+        nombre: product.nombre,
+        precio: Number(product.precio.toFixed(2)),
+        categoria: product.categoria,
+        stock: product.stock,
+        imagen: product.imagen,
+        descripcion: product.descripcion,
+        fechaCreacion: product.fechaCreacion,
+        descuento: product.descuento,
       },
-      rate: ivaRate,
-    });
-  } catch (error) {
-    console.error("Product search error:", error);
-    return res.status(500).json({ error: "Server error" });
-  }
-});
-
-app.get("/api/products/:id/iva", async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.id);
-    if (!product) {
-      return res.status(404).json({ error: "Product not found" });
-    }
-
-    const iva = Number((product.price * ivaRate).toFixed(2));
-    const totalWithIva = Number((product.price + iva).toFixed(2));
-    return res.json({
-      productId: product._id,
-      name: product.name,
-      price: Number(product.price.toFixed(2)),
       iva,
       totalWithIva,
       rate: ivaRate,
     });
   } catch (error) {
-    console.error("IVA lookup error:", error);
+    console.error("Product name search error:", error);
     return res.status(500).json({ error: "Server error" });
   }
 });

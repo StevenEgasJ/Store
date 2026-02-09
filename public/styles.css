@@ -62,12 +62,20 @@ h1 {
 
 .search-row {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 140px 1fr auto;
   gap: 12px;
   align-items: center;
 }
 
 .search input {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  font-size: 14px;
+  background: #fffdf9;
+}
+
+.search select {
   padding: 12px 14px;
   border-radius: 12px;
   border: 1px solid var(--border);
@@ -100,10 +108,41 @@ h1 {
   color: rgba(31, 31, 31, 0.7);
 }
 
+.meta {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: rgba(31, 31, 31, 0.6);
+}
+
 .actions {
   display: grid;
   gap: 8px;
   justify-items: end;
+}
+
+.iva {
+  margin: 0;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(31, 31, 31, 0.6);
+}
+
+.total {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.iva-card {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px dashed var(--border);
+  background: #fffefb;
+  min-width: 190px;
+  text-align: right;
 }
 
 button {
@@ -137,99 +176,6 @@ button:hover {
   min-height: 20px;
 }
 
-.modal {
-  position: fixed;
-  inset: 0;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 24px 16px;
-  z-index: 10;
-}
-
-.modal.open {
-  display: flex;
-}
-
-.modal-backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(25, 25, 25, 0.45);
-}
-
-.modal-card {
-  position: relative;
-  background: #fffaf5;
-  border-radius: 20px;
-  padding: 20px;
-  border: 1px solid var(--border);
-  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.18);
-  width: min(420px, 100%);
-  z-index: 1;
-  animation: pop 0.2s ease-out;
-}
-
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.modal-header h2 {
-  margin: 0;
-  font-size: 22px;
-}
-
-.close {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--ink);
-  padding: 6px 12px;
-  border-radius: 999px;
-  cursor: pointer;
-}
-
-.close:hover {
-  background: rgba(0, 0, 0, 0.04);
-}
-
-.modal-body {
-  margin-top: 16px;
-}
-
-.modal-product {
-  margin: 0 0 12px;
-  color: rgba(31, 31, 31, 0.7);
-}
-
-.modal-metrics {
-  display: grid;
-  gap: 12px;
-}
-
-.modal-metrics span {
-  font-size: 12px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: rgba(31, 31, 31, 0.6);
-}
-
-.modal-metrics strong {
-  display: block;
-  font-size: 20px;
-}
-
-@keyframes pop {
-  from {
-    transform: translateY(8px) scale(0.98);
-    opacity: 0.6;
-  }
-  to {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-  }
-}
 
 @media (max-width: 600px) {
   .card {
@@ -248,6 +194,10 @@ button:hover {
   .actions {
     width: 100%;
     justify-items: start;
+  }
+
+  .iva-card {
+    text-align: left;
   }
 
   .search-row {

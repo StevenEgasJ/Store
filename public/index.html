@@ -12,13 +12,17 @@
         <header>
           <p class="eyebrow">Partial 3</p>
           <h1>IVA Viewer</h1>
-          <p class="sub">Find a product and calculate its IVA.</p>
+          <p class="sub">Find a product by ID and calculate IVA.</p>
         </header>
 
         <form class="search" id="search-form">
-          <label for="search-name">Product name</label>
+          <label for="search-value">Search product</label>
           <div class="search-row">
-            <input id="search-name" name="search-name" placeholder="e.g. Milk" required />
+            <select id="search-type" name="search-type">
+              <option value="id">By ID</option>
+              <option value="name">By name</option>
+            </select>
+            <input id="search-value" name="search-value" placeholder="e.g. 20 or Vasos" required />
             <button type="submit">Find</button>
           </div>
         </form>
@@ -28,33 +32,6 @@
         <p class="status" id="status"></p>
       </section>
     </main>
-
-    <div class="modal" id="iva-modal" aria-hidden="true">
-      <div class="modal-backdrop" data-close="true"></div>
-      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <header class="modal-header">
-          <h2 id="modal-title">IVA Details</h2>
-          <button class="close" type="button" data-close="true">Close</button>
-        </header>
-        <div class="modal-body">
-          <p class="modal-product" id="modal-product">-</p>
-          <div class="modal-metrics">
-            <div>
-              <span>Price</span>
-              <strong id="modal-price">-</strong>
-            </div>
-            <div>
-              <span>IVA</span>
-              <strong id="modal-iva">-</strong>
-            </div>
-            <div>
-              <span>Total + IVA</span>
-              <strong id="modal-total">-</strong>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <script src="app.js"></script>
   </body>

@@ -1,86 +1,35 @@
 const statusText = document.getElementById("status");
 const form = document.getElementById("search-form");
-const nameInput = document.getElementById("search-name");
+const searchType = document.getElementById("search-type");
+const valueInput = document.getElementById("search-value");
 const result = document.getElementById("search-result");
-const modal = document.getElementById("iva-modal");
-const modalProduct = document.getElementById("modal-product");
-const modalPrice = document.getElementById("modal-price");
-const modalIva = document.getElementById("modal-iva");
-const modalTotal = document.getElementById("modal-total");
 
 const formatMoney = (value) => value.toFixed(2);
 
-const renderResult = (product) => {
+const renderResult = (product, iva, totalWithIva, rate) => {
+  const ratePercent = Math.round(rate * 100);
   result.innerHTML = `
     <article class="product single">
       <div>
-        <h2>${product.name}</h2>
-        <p class="price">Price: $${formatMoney(product.price)}</p>
+        <h2>${product.nombre}</h2>
+        <p class="price">Price: $${formatMoney(product.precio)}</p>
+        <p class="meta">Category: ${product.categoria || "-"}</p>
+        <p class="meta">Stock: ${product.stock ?? "-"}</p>
+        <p class="meta">Discount: ${product.descuento ?? 0}</p>
       </div>
       <div class="actions">
-        <button type="button" data-id="${product._id}">View IVA</button>
+        <div class="iva-card">
+          <p class="iva">IVA (${ratePercent}%): $${formatMoney(iva)}</p>
+          <p class="total">Total + IVA: $${formatMoney(totalWithIva)}</p>
+        </div>
       </div>
     </article>
   `;
 };
 
-const openModal = () => {
-  modal.classList.add("open");
-  modal.setAttribute("aria-hidden", "false");
-};
-
-const closeModal = () => {
-  modal.classList.remove("open");
-  modal.setAttribute("aria-hidden", "true");
-};
-
-modal.addEventListener("click", (event) => {
-  if (event.target.dataset.close === "true") {
-    closeModal();
-  }
-});
-
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && modal.classList.contains("open")) {
-    closeModal();
-  }
-});
-
 const clearResult = () => {
   result.innerHTML = "";
 };
-
-result.addEventListener("click", async (event) => {
-  const button = event.target.closest("button[data-id]");
-  if (!button) {
-    return;
-  }
-
-  const productId = button.dataset.id;
-  modalProduct.textContent = "Loading...";
-  modalPrice.textContent = "-";
-  modalIva.textContent = "-";
-  modalTotal.textContent = "-";
-  openModal();
-
-  try {
-    const response = await fetch(`/api/products/${productId}/iva`);
-    const payload = await response.json();
-    if (!response.ok) {
-      modalProduct.textContent = payload.error || "Error calculating IVA.";
-      return;
-    }
-
-    const ratePercent = Math.round(payload.rate * 100);
-    modalProduct.textContent = `${payload.name} (IVA ${ratePercent}%)`;
-    modalPrice.textContent = `$${formatMoney(payload.price)}`;
-    modalIva.textContent = `$${formatMoney(payload.iva)}`;
-    modalTotal.textContent = `$${formatMoney(payload.totalWithIva)}`;
-  } catch (error) {
-    console.error(error);
-    modalProduct.textContent = "Server error.";
-  }
-});
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -88,8 +37,13 @@ form.addEventListener("submit", async (event) => {
   clearResult();
 
   try {
-    const name = nameInput.value.trim();
-    const response = await fetch(`/api/products/search?name=${encodeURIComponent(name)}`);
+    const value = valueInput.value.trim();
+    const type = searchType.value;
+    const url =
+      type === "name"
+        ? `/api/products/search?name=${encodeURIComponent(value)}`
+        : `/api/products/${encodeURIComponent(value)}`;
+    const response = await fetch(url);
     const payload = await response.json();
 
     if (!response.ok) {
@@ -97,7 +51,7 @@ form.addEventListener("submit", async (event) => {
       return;
     }
 
-    renderResult(payload.product);
+    renderResult(payload.product, payload.iva, payload.totalWithIva, payload.rate);
     statusText.textContent = "Ready.";
   } catch (error) {
     console.error(error);
