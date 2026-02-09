@@ -49,6 +49,70 @@ app.get("/api/health", (_req, res) => {
   res.json({ ok: true });
 });
 
+app.get("/api/products", async (_req, res) => {
+  try {
+    const products = await Product.find({}, { name: 1, price: 1 }).sort({
+      createdAt: -1,
+    });
+    return res.json({ products, rate: ivaRate });
+  } catch (error) {
+    console.error("Products fetch error:", error);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
+app.get("/api/products/search", async (req, res) => {
+  try {
+    const nameQuery = String(req.query.name || "").trim();
+    if (!nameQuery) {
+      return res.status(400).json({ error: "Name query is required." });
+    }
+
+    const product = await Product.findOne({
+      name: { $regex: new RegExp(`^${nameQuery}$`, "i") },
+    });
+
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    return res.json({
+      product: {
+        _id: product._id,
+        name: product.name,
+        price: Number(product.price.toFixed(2)),
+      },
+      rate: ivaRate,
+    });
+  } catch (error) {
+    console.error("Product search error:", error);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
+app.get("/api/products/:id/iva", async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    const iva = Number((product.price * ivaRate).toFixed(2));
+    const totalWithIva = Number((product.price + iva).toFixed(2));
+    return res.json({
+      productId: product._id,
+      name: product.name,
+      price: Number(product.price.toFixed(2)),
+      iva,
+      totalWithIva,
+      rate: ivaRate,
+    });
+  } catch (error) {
+    console.error("IVA lookup error:", error);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
 app.post("/api/iva", async (req, res) => {
   try {
     const { products } = req.body;
