@@ -1,6 +1,5 @@
 const statusText = document.getElementById("status");
 const form = document.getElementById("search-form");
-const searchType = document.getElementById("search-type");
 const valueInput = document.getElementById("search-value");
 const result = document.getElementById("search-result");
 
@@ -38,17 +37,19 @@ form.addEventListener("submit", async (event) => {
 
   try {
     const value = valueInput.value.trim();
-    const type = searchType.value;
-    const url =
-      type === "name"
-        ? `/api/products/search?name=${encodeURIComponent(value)}`
-        : `/api/products/${encodeURIComponent(value)}`;
-    const response = await fetch(url);
-    const payload = await response.json();
+    const idResponse = await fetch(`/api/products/${encodeURIComponent(value)}`);
+    let payload = await idResponse.json();
 
-    if (!response.ok) {
-      statusText.textContent = payload.error || "Product not found.";
-      return;
+    if (!idResponse.ok) {
+      const nameResponse = await fetch(
+        `/api/products/search?name=${encodeURIComponent(value)}`
+      );
+      payload = await nameResponse.json();
+
+      if (!nameResponse.ok) {
+        statusText.textContent = payload.error || "Product not found.";
+        return;
+      }
     }
 
     renderResult(payload.product, payload.iva, payload.totalWithIva, payload.rate);

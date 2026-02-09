@@ -62,7 +62,7 @@ h1 {
 
 .search-row {
   display: grid;
-  grid-template-columns: 140px 1fr auto;
+  grid-template-columns: 1fr auto;
   gap: 12px;
   align-items: center;
 }
@@ -75,13 +75,6 @@ h1 {
   background: #fffdf9;
 }
 
-.search select {
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  font-size: 14px;
-  background: #fffdf9;
-}
 
 .product {
   display: flex;
